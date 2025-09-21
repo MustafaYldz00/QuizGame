@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Collections;
 using DG.Tweening;
 
@@ -11,6 +10,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text _soruText;
     [SerializeField] private Text _trueText, _falseText;
     [SerializeField] private GameObject _dogruButton, _yanlisButton;
+    [SerializeField] private GameObject _sonucPanel;
+    [SerializeField] private Text _dogruSayiText, _yanlisSayiText;
+    [SerializeField] private GameObject _yildiz1, _yildiz2, _yildiz3;
 
     public Soru[] _sorular;
     private static List<Soru> _cevaplanmamýsSorular;
@@ -54,13 +56,37 @@ public class GameManager : MonoBehaviour
     IEnumerator SoruArasibekle()
     {
         _cevaplanmamýsSorular.Remove(_gecerliSoru);
-        
+
         yield return new WaitForSeconds(0.75f);
-       
+
         if (_cevaplanmamýsSorular.Count <= 0)
         {
-            Debug.Log("Doðru Sayýsý: "+ _dogruAdedi + " yanliþ sayýsý: "+ _yanlisAdedi);
-        }else
+            _sonucPanel.SetActive(true);
+            Debug.Log("Doðru Sayýsý: " + _dogruAdedi + " yanliþ sayýsý: " + _yanlisAdedi);
+            _dogruSayiText.text = _dogruAdedi.ToString();
+            _yanlisSayiText.text = _yanlisAdedi.ToString();
+
+            
+            int toplamSoru = _dogruAdedi + _yanlisAdedi;  
+            float oran = (float)_dogruAdedi / toplamSoru; 
+            int kazanilanYildiz = 0;
+
+            if (oran == 1f)         
+                kazanilanYildiz = 3;
+            else if (oran >= 0.7f)  
+                kazanilanYildiz = 2;
+            else if (oran >= 0.3f)   
+                kazanilanYildiz = 1;
+            else
+                kazanilanYildiz = 0;
+
+            //  Yýldýzlarý aç/kapat
+            GameObject[] yildizlar = { _yildiz1, _yildiz2, _yildiz3 };
+            for (int i = 0; i < yildizlar.Length; i++)
+                yildizlar[i].SetActive(i < kazanilanYildiz);
+
+        }
+        else
         {
             RastgeleSoruSec();
         }
